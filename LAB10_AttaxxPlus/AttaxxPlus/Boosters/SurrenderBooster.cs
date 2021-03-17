@@ -17,7 +17,14 @@ namespace AttaxxPlus.Boosters
 
         public override bool TryExecute(Field selectedField, Field currentField)
         {
-            return false;
+            // figure out who surrendered, the other one will win
+            int who_won = (this.GameViewModel.CurrentPlayer == 1) ? 2 : 1;         
+            
+            // make every tile the enemy player's color
+            for (int row = 0; row < this.GameViewModel.Model.Fields.GetLength(0); row++)
+                for (int col = 0; col < this.GameViewModel.Model.Fields.GetLength(1); col++)
+                    this.GameViewModel.Model.Fields[row, col].Owner = who_won;
+            return true; // return always true
         }
     }
 }
