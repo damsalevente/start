@@ -12,11 +12,14 @@ namespace AttaxxPlus.Model.Operations
         {
             if (selectedField == null)
                 return false;
-
+            double rowdiff = Math.Abs(selectedField.Row - currentField.Row);
+            double coldiff = Math.Abs(selectedField.Column - currentField.Column);
+            bool nochange = (rowdiff == 0 && coldiff == 0);
             // Note: selectedField is always the players own field...
             // EVIP: IsEmpty() is more descriptive than "Owner == 0"
-            if (Math.Abs(selectedField.Row - currentField.Row)
-                + Math.Abs(selectedField.Column - currentField.Column) == 1
+            if (!nochange 
+                && rowdiff <= 1 
+                && coldiff <= 1
                 && !selectedField.IsEmpty()
                 && currentField.IsEmpty())
             {
