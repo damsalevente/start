@@ -32,8 +32,8 @@ namespace AttaxxPlus.ViewModel
             // Clicking own field selects that field.
             if (current.Owner == vm.CurrentPlayer)
             {
-                vm.SelectedField = current;
-                return;
+               vm.SelectedField = current;  
+               return;
             }
 
             // EVIP: lazy evaluation to avoid null reference exception.

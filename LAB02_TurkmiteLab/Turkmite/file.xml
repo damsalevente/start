@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="husky">
+   <xacro:include filename="$(find husky_description)/urdf/husky.urdf.xacro" />
+   <!-- Insert customization below, sample provided: -->
+   <link name="bowler_link">
+      <visual>
+         <geometry>
+            <mesh filename="package://husky_custom_description/meshes/red_bowler.dae" />
+         </geometry>
+      </visual>
+      <collision>
+         <origin xyz="0 0 0.07" rpy="0 0 0" />
+         <geometry>
+            <box size="0.32 0.25 0.14" rpy="0 0 0" />
+         </geometry>
+      </collision>
+   </link>
+   <!-- added box links -->
+   <link name="mylink1">
+      <visual>
+         <geometry>
+            <mesh filename="package://husky_custom_description/meshes/red_bowler.dae" />
+         </geometry>
+      </visual>
+      <collision>
+         <origin xyz="1 0 0.07" rpy="0 0 0" />
+         <geometry>
+            <box size="0.32 0.25 0.14" rpy="0 0 0" />
+         </geometry>
+      </collision>
+   </link>
+   <link name="mylink2">
+      <visual>
+         <geometry>
+            <mesh filename="package://husky_custom_description/meshes/red_bowler.dae" />
+         </geometry>
+      </visual>
+      <collision>
+         <origin xyz="-1 0 0.07" rpy="0 0 0" />
+         <geometry>
+            <box size="0.32 0.25 0.14" rpy="0 0 0" />
+         </geometry>
+      </collision>
+   </link>
+   <!-- lidar link -->
+   <link name="lidar_link">
+      <visual>
+         <geometry>
+            <mesh filename="package://husky_custom_description/meshes/red_bowler.dae" />
+         </geometry>
+      </visual>
+      <collision>
+         <origin xyz="0 0 0.07" rpy="0 0 0" />
+         <geometry>
+            <cylinder radius="0.32" length="0.32" />
+         </geometry>
+      </collision>
+   </link>
+   <joint name="bowler_joint" type="fixed">
+      <parent link="top_plate_link" />
+      <child link="bowler_link" />
+      <origin xyz="5 -5 0" rpy="0 0 0.5" />
+   </joint>
+   <!-- joint for lidar sensor -->
+   <joint name="lidar_joint" type="fixed">
+      <parent link="top_plate_link" />
+      <child link="lidar_link" />
+      <origin xyz="0 0 0" rpy="0 0 0.0" />
+   </joint>
+   <!-- two fixed joint nodes -->
+   <joint name="camera_joint_front" type="fixed">
+      <parent link="top_plate_link" />
+      <child link="mylink1" />
+      <origin xyz="1 0 0" rpy="0 0 0.0" />
+   </joint>
+   <joint name="camera_joint_back" type="fixed">
+      <parent link="top_plate_link" />
+      <child link="mylink2" />
+      <origin xyz="-1 -0.1 0" rpy="0 0 3.14" />
+   </joint>
+   <!-- camera1 -->
+   <gazebo reference="mylink1">
+      <sensor type="camera" name="camera1">
+         <update_rate>30.0</update_rate>
+         <camera name="head">
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+               <width>800</width>
+               <height>800</height>
+               <format>R8G8B8</format>
+            </image>
+            <clip>
+               <near>0.02</near>
+               <far>300</far>
+            </clip>
+            <noise>
+               <type>gaussian</type>
+               <mean>0.0</mean>
+               <stddev>0.007</stddev>
+            </noise>
+         </camera>
+         <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+            <alwaysOn>true</alwaysOn>
+            <updateRate>0.0</updateRate>
+            <cameraName>camera1</cameraName>
+            <imageTopicName>image_raw</imageTopicName>
+            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+            <frameName>camera1_link</frameName>
+         </plugin>
+      </sensor>
+   </gazebo>
+   <!-- camera2 -->
+   <gazebo reference="mylink2">
+      <sensor type="camera" name="camera2">
+         <update_rate>30.0</update_rate>
+         <camera name="head">
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+               <width>800</width>
+               <height>800</height>
+               <format>R8G8B8</format>
+            </image>
+            <clip>
+               <near>0.02</near>
+               <far>300</far>
+            </clip>
+            <noise>
+               <type>gaussian</type>
+               <mean>0.0</mean>
+               <stddev>0.007</stddev>
+            </noise>
+         </camera>
+         <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+            <alwaysOn>true</alwaysOn>
+            <updateRate>0.0</updateRate>
+            <cameraName>camera2</cameraName>
+            <imageTopicName>image_raw</imageTopicName>
+            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+            <frameName>camera1_link</frameName>
+         </plugin>
+      </sensor>
+   </gazebo>
+   <gazebo reference="lidar_link">
+      <turnGravityOff>true</turnGravityOff>
+      <sensor type="ray" name="laser">
+         <pose>0 0 0 0 0 0</pose>
+         <visualize>false</visualize>
+         <update_rate>30</update_rate>
+         <ray>
+            <scan>
+               <horizontal>
+                  <samples>360</samples>
+                  <resolution>1</resolution>
+                  <!-- Change to -180 and 180 degree, watch out, config expects radians-->
+                  <min_angle>-3.14</min_angle>
+                  <max_angle>3.14</max_angle>
+               </horizontal>
+            </scan>
+            <range>
+               <min>0.1</min>
+               <max>100.0</max>
+               <resolution>0.01</resolution>
+            </range>
+            <noise>
+               <type>gaussian</type>
+               <mean>0.0</mean>
+               <stddev>0.001</stddev>
+            </noise>
+         </ray>
+         <plugin name="gazebo_ros_laser" filename="libgazebo_ros_laser.so">
+            <topicName>scan</topicName>
+            <frameName>laser</frameName>
+            <robotNamespace>/</robotNamespace>
+         </plugin>
+      </sensor>
+   </gazebo>
+   <!-- GPS sensor -->
+   <gazebo>
+      <plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+         <robotNamespace>/</robotNamespace>
+         <updateRate>30</updateRate>
+         <bodyName>base_link</bodyName>
+         <frameId>base_link</frameId>
+         <topicName>navsat/fix</topicName>
+         <velocityTopicName>navsat/vel</velocityTopicName>
+         <referenceLatitude>0</referenceLatitude>
+         <referenceLongitude>0</referenceLongitude>
+         <referenceHeading>0</referenceHeading>
+         <referenceAltitude>0</referenceAltitude>
+         <drift>0.0001 0.0001 0.0001</drift>
+      </plugin>
+   </gazebo>
+</robot>
